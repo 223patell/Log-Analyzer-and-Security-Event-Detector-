@@ -1,0 +1,39 @@
+import time, glob
+from parser.parser import parse_line
+from storage.storagedb import init_db, insert_event
+from guides.guides import guide_bruteforce
+from alerts.alert_storage import alert_storage
+
+conn = init_db()
+
+RAW_DIR = "loganalyzer/raw_logs"
+
+def process_files (conn):
+
+        for f in glob.glob(RAW_DIR + "/*.in"):
+                print(f)        
+                with open(f) as fh:
+                        for line in fh:
+                                print(line.strip())
+                                event = parse_line(line)
+
+                                insert_event (conn,event)
+def run():
+       
+        while True:
+
+                process_files(conn)
+                alerts = guide_bruteforce(conn)
+
+                if alerts:
+                        print ("\n=== ALERTS IN THIS CYCLE ===")
+                        for alert in alerts:
+                                alert_storage(conn, alert)
+                        print(f"[{alert['severity']}] {alert['alert_type']}: {alert['details']}")
+                if not alerts:
+                        print("No alerts this cycle.")
+
+                time.sleep(10)
+
+if __name__ == "__main__":
+        run()
