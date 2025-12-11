@@ -1,0 +1,30 @@
+import datetime 
+
+def guide_bruteforce (conn, threshold=1):
+
+        cur = conn.cursor()
+
+        cur.execute ("""
+                SELECT src_ip, user,COUNT(*) as c 
+                 FROM events
+                WHERE  event_type = 'auth_failed'
+                GROUP BY src_ip
+        """)
+        rows = cur.fetchall()
+
+        print("rows" , rows)
+
+        alerts =[]
+
+
+        for ip, user, count in rows:
+                print(ip,user, count)
+                if count >= threshold:
+                        alerts.append({
+                                "alert_type": "bruteforce",
+                                "severity": "HIGH",
+                                "details": f"{count} failed SSH logins for user {user} from {ip}"})
+
+        print(alerts)
+
+        return alerts
