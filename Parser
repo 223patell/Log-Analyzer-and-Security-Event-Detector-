@@ -1,0 +1,45 @@
+import re
+
+AUTH_RE = re.compile(
+    r"Failed password for (?:invalid user\s+)?(?P<user>\S+)\s+from\s+(?P<ip>\d+\.\d+\.\d+\.\d+)"
+)
+
+def parse_line(line: str):
+    line = line.strip()
+    if not line:
+        return None
+
+    parts = line.split(maxsplit=2)
+    if len(parts) < 3:
+        return {"raw": line}
+
+    ts, host, rest = parts
+
+    record = {
+        "timestamp": ts,
+        "host": host,
+        "process": None,
+        "pid": None,
+        "msg": rest,      
+        "raw": line,
+        "event_type": None,
+        "src_ip": None,
+        "user": None,
+    }
+
+    am = AUTH_RE.search(rest)
+    if am:
+        record["event_type"] = "auth_failed"
+        record["user"] = am.group("user")
+        record["src_ip"] = am.group("ip")
+
+    return record
+
+if __name__ == "__main__":
+    import sys
+    filename = sys.argv[1]
+
+    with open(filename) as f:
+        for line in f:
+            parsed = parse_line(line)
+            print(parsed)
