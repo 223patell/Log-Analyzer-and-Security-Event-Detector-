@@ -1,0 +1,10 @@
+import datetime 
+
+def alert_storage(conn, alert): 
+        curr = conn.cursor()
+        cur.execute(""" 
+        INSERT INTO alerts(timestamp, alert_type, severity, details)
+        VALUES (?,?,?,?)
+        """, (datetime.datetime.utcnow().isoformat(),
+                alert["alert_type"], alert["severity"], alert["details"]))
+        conn.commit()
