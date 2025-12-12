@@ -1,58 +1,53 @@
-import sqlite3
+import sqlite3 
+import os
 from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parent.parent / "events.db"
 
-def init_db():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    cur = conn.cursor()
+def init_db(): 
+        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+        cur = conn.cursor()
 
-    cur.execute("""
+        cur.execute ("""
         CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY,
-            timestamp TEXT,
-            host TEXT,
-            process TEXT,
-            pid TEXT,
-            msg TEXT,
-            event_type TEXT,
-            src_ip TEXT,
-            user TEXT,
-            raw TEXT
+                id INTEGER PRIMARY KEY,
+                timestamp TEXT,
+                host TEXT,
+                process TEXT,
+                pid TEXT,
+                messsage TEXT,
+                event_type TEXT,
+                src_ip TEXT,
+                user TEXT,
+                raw TEXT        
         )
-    """)
+        """)
 
-    cur.execute("""
+        cur.execute("""
         CREATE TABLE IF NOT EXISTS alerts (
-            id INTEGER PRIMARY KEY,
-            timestamp TEXT,
-            alert_type TEXT,
-            severity TEXT,
-            details TEXT,
-            acknowledge INTEGER DEFAULT 0
+                id INTEGER PRIMARY KEY,
+                timestamp TEXT,
+                alert_type TEXT,
+                severity TEXT,
+                details TEXT,
+                acknowledge INTEGER DEFAULT 0
         )
-    """)
+        """)
 
-    conn.commit()
-    return conn
+        conn.commit()
+
+
+        return conn
 
 def insert_event(conn, event):
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO events(timestamp, host, process, pid, msg, event_type, src_ip, user, raw)
+        cur = conn.cursor()
+        cur.execute("""
+        INSERT INTO events(timestamp, host, process, pid, message, event_type, src_ip, user, raw)
         VALUES(?,?,?,?,?,?,?,?,?)
-    """, (
-        event.get("timestamp"),
-        event.get("host"),
-        event.get("process"),
-        event.get("pid"),
-        event.get("msg"),          
-        event.get("event_type"),
-        event.get("src_ip"),
-        event.get("user"),
-        event.get("raw"),
-    ))
-    conn.commit()
-
-    if event.get("event_type") == "auth_failed":
-        print("INSERTED auth_failed event:", event)
+        """, (event.get("timestamp"), event.get("host"), event.get("process"),
+                event.get("pid"), event.get("message"), event.get("event_type"),
+                event.get("src_ip"), event.get("user"), event.get("raw")))
+        conn.commit()
+   
+if event.get("event_type") == "auth.failed":
+                print("INSERTED auth_failed event:", event)
