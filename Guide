@@ -1,30 +1,25 @@
-import datetime 
+def guide_bruteforce(conn, threshold=1):
+   
+    cur = conn.cursor()
 
-def guide_bruteforce (conn, threshold=1):
+    cur.execute("""
+        SELECT src_ip, user, COUNT(*) AS c
+        FROM events
+        WHERE event_type = 'auth_failed'
+        GROUP BY src_ip, user
+    """)
 
-        cur = conn.cursor()
+    rows = cur.fetchall()
 
-        cur.execute ("""
-                SELECT src_ip, user,COUNT(*) as c 
-                 FROM events
-                WHERE  event_type = 'auth_failed'
-                GROUP BY src_ip
-        """)
-        rows = cur.fetchall()
+    alerts = []
 
-        print("rows" , rows)
+    for ip, user, count in rows:
+        
+        if count >= threshold:
+            alerts.append({
+                "alert_type": "bruteforce",      # What type of alert this is
+                "severity": "HIGH",              # Severity level
+                "details": f"{count} failed SSH logins for user {user} from {ip}", 
+            })
 
-        alerts =[]
-
-
-        for ip, user, count in rows:
-                print(ip,user, count)
-                if count >= threshold:
-                        alerts.append({
-                                "alert_type": "bruteforce",
-                                "severity": "HIGH",
-                                "details": f"{count} failed SSH logins for user {user} from {ip}"})
-
-        print(alerts)
-
-        return alerts
+    return alerts
