@@ -6,27 +6,29 @@ from alerts.alert_storage import alert_storage
 
 conn = init_db()
 
-RAW_DIR = "loganalyzer/raw_logs"
+RAW_DIR = "/loganalyzer/raw_logs"
 
-def process_files (conn):
+def process_files(conn):
+    for f in glob.glob(RAW_DIR + "/*.in"):
+        with open(f, "r+") as fh:
+            for line in fh:
+                event = parse_line(line)
+                if not event:
+                    continue
+                insert_event(conn, event)
 
-        for f in glob.glob(RAW_DIR + "/*.in"):
-                print(f)        
-                with open(f) as fh:
-                        for line in fh:
-                                print(line.strip())
-                                event = parse_line(line)
+            fh.seek(0)
+            fh.truncate()
 
-                                insert_event (conn,event)
 def run():
-       
+     
         while True:
 
                 process_files(conn)
                 alerts = guide_bruteforce(conn)
 
                 if alerts:
-                        print ("\n=== ALERTS IN THIS CYCLE ===")
+                        print ("\n=== ALERTS THIS CYCLE ===")
                         for alert in alerts:
                                 alert_storage(conn, alert)
                         print(f"[{alert['severity']}] {alert['alert_type']}: {alert['details']}")
