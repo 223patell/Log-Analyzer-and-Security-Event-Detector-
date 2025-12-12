@@ -23,10 +23,8 @@ def process_files(conn):
 def run():
      
         while True:
-
                 process_files(conn)
                 alerts = guide_bruteforce(conn)
-
                 if alerts:
                         print ("\n=== ALERTS THIS CYCLE ===")
                         for alert in alerts:
