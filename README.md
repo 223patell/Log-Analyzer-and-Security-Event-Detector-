@@ -1,7 +1,7 @@
 
 For this project, I built a real‑time log analyzer and security event detection system for the Raspberry Pi. The system continuously collects system logs, parses them into a structured format, stores them in a SQLite database, and analyzes the events to identify potentially malicious activity. When suspicious patterns are detected—such as multiple failed SSH login attempts—the analyzer generates alerts that include the source IP, target user, number of attempts, timestamp, and severity level. Unauthorized login attempts are extremely common on Linux devices, especially exposed or low‑cost systems like Raspberry Pis, so this tool is designed to detect and surface those threats as soon as they occur.
 
-    The Directory Structure
+        The Directory Structure
 
 loganalyzer
 
@@ -46,7 +46,7 @@ loganalyzer
 
 
 
-      The Set Up
+         The Set Up
 
 Raspberry Pi 4
 
@@ -63,7 +63,7 @@ Python3 with sqlite3, dateuil, and pathlib
 
 
 
-    The Steps
+        The Steps
 
   The Analyzer:
   
@@ -88,4 +88,26 @@ The guide decides if the event is malicious enough to generate an alert. If it i
   Alerts:
   
 The alerts are stored in the previously set alerts table and print to the console in real time. 
+
+        Security Considerations
+->Sensitive Log Data
+
+System logs may contain usernames, IP addresses, and other private information. Ensure that log files and the SQLite database are readable only by authorized users.
+
+->Database Permissions
+
+The events.db file should be protected with strict file permissions to prevent unauthorized access.
+
+->Log Flooding Risks
+
+Excessive or malicious log activity can overwhelm the system. Consider rate‑limiting, deduplication, or thresholds to reduce noise.
+
+->Pipeline Integrity
+
+If logs or analyzer code are modified, real alerts could be suppressed. Keep the project directory secured and restrict write access.
+
+->Detection, Not Prevention
+
+This tool identifies attacks but does not block them. Users should still secure SSH with strong passwords, key‑based authentication, and IP restrictions.
+
 
