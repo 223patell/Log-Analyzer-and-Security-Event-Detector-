@@ -71,7 +71,8 @@ The guide decides if the event is malicious enough to generate an alert. If it i
 The alerts are stored in the previously set alerts table and print to the console in real time. 
 
 ## Security Considerations
-->Sensitive Log Data
+
+#### Sensitive Log Data
 
 System logs may contain usernames, IP addresses, and other private information. Ensure that log files and the SQLite database are readable only by authorized users.
 
